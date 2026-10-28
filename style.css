@@ -79,3 +79,4 @@ footer { text-align: center; font-size: 11px; color: var(--sub); padding: 12px; 
 .hero-img img { display: block; width: 100%; height: auto; }
 .card-img { display: block; width: 100%; border-radius: 14px; margin: 10px 0 14px; }
 .toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 13px; z-index: 9; display: none; }
+.presc-lead{margin:14px 0 0;font-size:14px;font-weight:700;color:#8a6d12;letter-spacing:.02em}

@@ -516,7 +516,7 @@
     var t2 = h('<table><tbody><tr><th>業務</th><th>人数</th><th>週h/人（目安）</th><th>削減率</th><th>現状</th><th>残業</th></tr></tbody></table>');
     r.by_area.forEach(function (ar) { ar.tasks.forEach(function (t) { t2.querySelector('tbody').appendChild(hRow('<tr><td>' + esc(t.name) + '</td><td>' + t.n + '</td><td>' + t.hours + '（' + t.hours_per_week + '）</td><td>' + t.rate_low + '/' + t.rate_mid + '/' + t.rate_high + '</td><td>' + t.status + '</td><td>' + (LABELS.overtime[t.overtime] || '').slice(0, 6) + '</td></tr>')); }); });
     det.appendChild(t2);
-    det.appendChild(h('<p class="small">推計です。面談で実態に合わせて直します。既定値の根拠：AMIチームの支援実績・業種別ロードマップ・一般的な生成AI活用事例（マスタ ' + esc(master.version) + '）。</p>'));
+    det.appendChild(h('<p class="small">推計です。面談で実態に合わせて直します。既定値の根拠：業種別ロードマップ・支援実績・一般的な生成AI活用事例（マスタ ' + esc(master.version) + '）。</p>'));
     el.appendChild(det);
     return el;
   }
@@ -524,25 +524,11 @@
   function rPrescription() {
     var a = S.a, r = S.result || computeNow();
     var route = C.decideRoute(a); S.route = route;
-    var est = C.trainingEstimate(a);
-    var why = { A: '使われる仕組みまでAMI側で巻き取ります。入れて終わりにしないための順番です。', B: '入れる前に、使える人を全社で作ります。定着の第一歩です。', C: '経営と幹部が先に使えるようになると、現場に広がる順番が作れます。', D: '入れる前に、現場で使える人を作ります。定着の第一歩です。' }[route];
-    var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg" alt="御社の診断結果"></div><h2>' + esc(LABELS.route[route]) + '</h2><span class="route-tag">ルート ' + route + '</span></div>');
-    var body = '';
-    if (route === 'A' || route === 'B') body += '<div class="card"><h3 style="margin-top:0">AMI（経営×AI・6ヶ月）</h3></div>';
-    if (route !== 'A') {
-      body += '<div class="card"><h3 style="margin-top:0">研修の目安（御社の' + est.headcount + '名の場合）</h3>';
-      if (route === 'B' || route === 'D') body += '<p>従業員向け0→1 eラーニング研修：全社で ' + man(est.elearning_total) + '。人材開発支援助成金の要件を満たせば、自己負担は <b>' + man(est.elearning_self) + '</b> の見込みです。</p>';
-      if (route === 'B' || route === 'C') body += '<p>対面2days研修：1人 40万円（助成金利用時 10万円）。幹部5名なら 200万円（助成金利用時 50万円）。</p><p>経営者向け2days合宿：40万円（助成金の対象外）。</p>';
-      body += '<p class="small">助成金は要件充足・計画届の提出が前提で、受給を保証するものではありません。</p></div>';
-    }
-    if (route === 'C' && a.p1 === 'owner') body += '<div class="card"><p>社長ご自身で実装まで進めたい場合は、AI経営参謀プログラム（6ヶ月）もご案内できます。</p></div>';
-    el.appendChild(h('<div>' + body + '</div>'));
+    var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg" alt="御社の診断結果"></div><p class="presc-lead">AIと経営の現場を知り尽くした公認会計士の</p><h2>無料相談（オンライン60分）</h2></div>');
     el.appendChild(h('<img class="card-img" src="img/card_meeting.jpg" alt="公認会計士によるAI活用診断 オンライン60分・無料">'));
-    var b1 = h('<button class="btn primary">面談を予約する（AI活用診断・オンライン60分）</button>');
+    var b1 = h('<button class="btn primary">無料相談を予約する</button>');
     b1.onclick = function () { a.cta = 'book'; ga('diag_cta_book', { route: route }); go(0, 'S19'); };
-    var b2 = h('<button class="btn ghost">資料を受け取る</button>');
-    b2.onclick = function () { a.cta = 'doc'; ga('diag_cta_doc', { route: route }); go(0, 'S19'); };
-    el.appendChild(b1); el.appendChild(b2);
+    el.appendChild(b1);
     if (a.role === 'manager') { var b3 = h('<button class="btn navy">社長に転送する</button>'); b3.onclick = function () { a.cta = 'share'; shareResult(); }; el.appendChild(b3); }
     var back = h('<button class="btn ghost">戻る</button>'); back.onclick = function () { go(-1); }; el.appendChild(back);
     return el;
