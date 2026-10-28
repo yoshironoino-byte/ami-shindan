@@ -146,7 +146,7 @@
   }
 
   function rIntro() {
-    var el = h('<div><div class="hero-img"><img src="img/hero_liff.jpg" alt="AI導入しないあなたはいくら損してる？ 10分でできるAI活用診断"></div>' +
+    var el = h('<div><div class="hero-img"><img src="img/hero_liff.jpg?v=63" alt="10分AI経営ドック 現場を知り尽くした公認会計士が徹底診断"></div>' +
       '</div>');
     var saved = loadSaved();
     if (saved && saved.a && saved.a.industry) {
@@ -456,7 +456,7 @@
 
   function rResult() {
     var r = computeNow(); var a = S.a; var d = r.display;
-    var el = h('<div><div class="hero-img"><img src="img/header_result.jpg" alt="診断結果"></div></div>');
+    var el = h('<div><div class="hero-img"><img src="img/header_result.jpg?v=63" alt="診断結果"></div></div>');
     var zero = r.raw.mid < 10000;
     var hero = zero ?
       '<div class="hero"><div class="lead">診断結果</div><div class="amount">すでにAIを活用できています</div><div class="range">選んだ業務はいずれも「AI活用済み」でした。次は定着と横展開です。</div></div>' :
@@ -524,8 +524,8 @@
   function rPrescription() {
     var a = S.a, r = S.result || computeNow();
     var route = C.decideRoute(a); S.route = route;
-    var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg" alt="御社の診断結果"></div><p class="presc-lead">AIと経営の現場を知り尽くした公認会計士の</p><h2>無料相談（オンライン60分）</h2></div>');
-    el.appendChild(h('<img class="card-img" src="img/card_meeting.jpg" alt="公認会計士によるAI活用診断 オンライン60分・無料">'));
+    var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg?v=63" alt="御社の診断結果"></div><p class="presc-lead">AIと経営の現場を知り尽くした公認会計士の</p><h2>無料相談（オンライン60分）</h2></div>');
+    el.appendChild(h('<img class="card-img" src="img/card_meeting.jpg?v=63" alt="AIと経営の現場を知り尽くした公認会計士の無料個別相談">'));
     var b1 = h('<button class="btn primary">無料相談を予約する</button>');
     b1.onclick = function () { a.cta = 'book'; ga('diag_cta_book', { route: route }); go(0, 'S19'); };
     el.appendChild(b1);
@@ -536,7 +536,7 @@
 
   function resultUrl() { var base = CFG.RESULT_BASE_URL || (location.origin + location.pathname); return base + '?r=' + encodeURIComponent(S.token); }
   function shareResult() {
-    var text = '【AI活用診断の結果】年間 約' + man(S.result.display.mid) + '（' + man(S.result.display.lo) + '〜' + man(S.result.display.hi) + '）を捨てている計算になりました。\n' + resultUrl();
+    var text = '【10分AI経営ドックの結果】年間 約' + man(S.result.display.mid) + '（' + man(S.result.display.lo) + '〜' + man(S.result.display.hi) + '）を捨てている計算になりました。\n' + resultUrl();
     if (liffReady && window.liff && liff.isApiAvailable && liff.isApiAvailable('shareTargetPicker')) { liff.shareTargetPicker([{ type: 'text', text: text }]).then(function () { toast('転送しました'); }).catch(function () { copy(text); }); }
     else copy(text);
     function copy(t) { try { navigator.clipboard.writeText(t); toast('結果の文章をコピーしました'); } catch (e) { toast(t); } }
