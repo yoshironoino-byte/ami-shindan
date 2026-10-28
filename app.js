@@ -526,7 +526,7 @@
     var route = C.decideRoute(a); S.route = route;
     var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg?v=63" alt="御社の診断結果"></div><p class="presc-lead">AIと経営の現場を知り尽くした公認会計士の</p><h2>無料相談（オンライン60分）</h2></div>');
     el.appendChild(h('<img class="card-img" src="img/card_meeting.jpg?v=63" alt="AIと経営の現場を知り尽くした公認会計士の無料個別相談">'));
-    var b1 = h('<button class="btn primary">無料相談を予約する</button>');
+    var b1 = h('<button class="btn primary">詳細診断はこちら</button>');
     b1.onclick = function () { a.cta = 'book'; ga('diag_cta_book', { route: route }); go(0, 'S19'); };
     el.appendChild(b1);
     if (a.role === 'manager') { var b3 = h('<button class="btn navy">社長に転送する</button>'); b3.onclick = function () { a.cta = 'share'; shareResult(); }; el.appendChild(b3); }
@@ -553,7 +553,7 @@
     var b = h('<button class="btn primary">LINEに戻る</button>');
     b.onclick = function () { finish(txt); };
     el.appendChild(b);
-    if (CFG.BOOKING_URL && S.a.cta === 'book') el.appendChild(h('<a class="btn navy" href="' + esc(CFG.BOOKING_URL) + '">予約ページを開く（案内用）</a>'));
+    if (CFG.BOOKING_URL && S.a.cta === 'book') el.appendChild(h('<a class="btn navy" href="' + esc(CFG.BOOKING_URL) + '">詳細診断を申し込む</a>'));
     postToGas('complete');
     ga('diag_complete', { route: S.route, loss_band: C.lossBand(S.result.mid) });
     return el;
