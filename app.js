@@ -126,7 +126,7 @@
     if (cur < resultIdx) {
       var remain = resultIdx - cur; left.textContent = 'あと' + remain + '問';
       var p = Math.round((cur / resultIdx) * 100); pct.textContent = p + '%'; fill.style.width = p + '%';
-    } else { left.textContent = cur < screens.length - 1 ? '処方箋まであと少し' : '完了'; pct.textContent = '100%'; fill.style.width = '100%'; }
+    } else { left.textContent = cur < screens.length - 1 ? '診断結果まであと少し' : '完了'; pct.textContent = '100%'; fill.style.width = '100%'; }
   }
 
   // ---------- 描画 ----------
@@ -500,7 +500,7 @@
     if (cs.length) el.appendChild(h('<div class="card"><h3 style="margin-top:0">同業は、もう動いています</h3>' + caseHtml(cs[0]) + (zero ? '' : '<p class="sub">その会社との差は、毎年この額ずつ開きます。</p>') + '</div>'));
     el.appendChild(h('<p class="pardon">悪いのは社長ではありません。何から始めるかを、誰も順番で教えてくれなかっただけです。</p>'));
     if (false) el.appendChild(h('<div class="card"><h3 style="margin-top:0">入れて終わりだと、戻らない分</h3><p>いまの現場の状態から推計した定着率は <b>' + r.retention_rate + '%</b>。このまま入れると、約<span class="danger">' + man(C.roundYen(r.unrecovered_mid)) + '</span>分は現場で使われずに戻らない可能性があります。</p></div>'));
-    var nav = navBar('処方箋を見る', true, function () { ga('diag_result_next'); return true; }); el.appendChild(nav);
+    var nav = navBar('診断結果を見る', true, function () { ga('diag_result_next'); return true; }); el.appendChild(nav);
     // 前提
     var det = h('<details class="assump"><summary>この計算の前提（すべて開示）</summary></details>');
     det.addEventListener('toggle', function () { if (det.open) { S.a.assumptions_opened = true; save(); ga('diag_assumptions_open'); } });
@@ -526,7 +526,7 @@
     var route = C.decideRoute(a); S.route = route;
     var est = C.trainingEstimate(a);
     var why = { A: '使われる仕組みまでAMI側で巻き取ります。入れて終わりにしないための順番です。', B: '入れる前に、使える人を全社で作ります。定着の第一歩です。', C: '経営と幹部が先に使えるようになると、現場に広がる順番が作れます。', D: '入れる前に、現場で使える人を作ります。定着の第一歩です。' }[route];
-    var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg" alt="御社への処方箋"></div><h2>' + esc(LABELS.route[route]) + '</h2><span class="route-tag">ルート ' + route + '</span></div>');
+    var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg" alt="御社の診断結果"></div><h2>' + esc(LABELS.route[route]) + '</h2><span class="route-tag">ルート ' + route + '</span></div>');
     var body = '';
     if (route === 'A' || route === 'B') body += '<div class="card"><h3 style="margin-top:0">AMI（経営×AI・6ヶ月）</h3><p class="small">補助金・融資で投資負担を圧縮できる可能性があります（採択を保証するものではありません）。</p></div>';
     if (route !== 'A') {
