@@ -524,8 +524,8 @@
   function rPrescription() {
     var a = S.a, r = S.result || computeNow();
     var route = C.decideRoute(a); S.route = route;
-    var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg?v=63" alt="御社の診断結果"></div><p class="presc-lead">AIと経営の現場を知り尽くした公認会計士の</p><h2>無料相談（オンライン60分）</h2></div>');
-    el.appendChild(h('<img class="card-img" src="img/card_meeting.jpg?v=63" alt="AIと経営の現場を知り尽くした公認会計士の無料個別相談">'));
+    var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg?v=63" alt="御社の診断結果"></div><p class="presc-lead">AIと経営の現場を知り尽くした公認会計士の</p><h2>無料の詳細診断（オンライン60分）</h2></div>');
+    el.appendChild(h('<img class="card-img" src="img/card_meeting.jpg?v=64" alt="AIと経営の現場を知り尽くした公認会計士の無料の詳細診断">'));
     var b1 = h('<button class="btn primary">詳細診断はこちら</button>');
     b1.onclick = function () { a.cta = 'book'; ga('diag_cta_book', { route: route }); go(0, 'S19'); };
     el.appendChild(b1);
