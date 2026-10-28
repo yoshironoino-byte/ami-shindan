@@ -146,7 +146,7 @@
   }
 
   function rIntro() {
-    var el = h('<div><div class="hero-img"><img src="img/hero_liff.jpg" alt="AI導入しないあなたはいくら損してる？ 5分でできるAI活用診断"></div>' +
+    var el = h('<div><div class="hero-img"><img src="img/hero_liff.jpg" alt="AI導入しないあなたはいくら損してる？ 10分でできるAI活用診断"></div>' +
       '</div>');
     var saved = loadSaved();
     if (saved && saved.a && saved.a.industry) {
@@ -528,7 +528,7 @@
     var why = { A: '使われる仕組みまでAMI側で巻き取ります。入れて終わりにしないための順番です。', B: '入れる前に、使える人を全社で作ります。定着の第一歩です。', C: '経営と幹部が先に使えるようになると、現場に広がる順番が作れます。', D: '入れる前に、現場で使える人を作ります。定着の第一歩です。' }[route];
     var el = h('<div><div class="hero-img"><img src="img/header_presc.jpg" alt="御社の診断結果"></div><h2>' + esc(LABELS.route[route]) + '</h2><span class="route-tag">ルート ' + route + '</span></div>');
     var body = '';
-    if (route === 'A' || route === 'B') body += '<div class="card"><h3 style="margin-top:0">AMI（経営×AI・6ヶ月）</h3><p class="small">補助金・融資で投資負担を圧縮できる可能性があります（採択を保証するものではありません）。</p></div>';
+    if (route === 'A' || route === 'B') body += '<div class="card"><h3 style="margin-top:0">AMI（経営×AI・6ヶ月）</h3></div>';
     if (route !== 'A') {
       body += '<div class="card"><h3 style="margin-top:0">研修の目安（御社の' + est.headcount + '名の場合）</h3>';
       if (route === 'B' || route === 'D') body += '<p>従業員向け0→1 eラーニング研修：全社で ' + man(est.elearning_total) + '。人材開発支援助成金の要件を満たせば、自己負担は <b>' + man(est.elearning_self) + '</b> の見込みです。</p>';
