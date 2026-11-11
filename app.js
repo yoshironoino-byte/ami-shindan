@@ -4,6 +4,7 @@
 (function () {
   'use strict';
   var CFG = window.SHINDAN_CONFIG || {};
+  var STORAGE_KEY = CFG.STANDALONE ? 'shindan_seminar_v4' : 'shindan_v4';
   var C = window.ShindanCalc;
   var $main = document.getElementById('main');
   var master = null, cases = null, taxonomy = null;
@@ -52,8 +53,8 @@
   function yen(v) { return Math.round(v).toLocaleString('ja-JP') + '円'; }
   function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(function () { t.style.display = 'none'; }, 2500); }
   function genToken() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
-  function save() { try { localStorage.setItem('shindan_v4', JSON.stringify({ S: S, at: Date.now() })); } catch (e) {} }
-  function loadSaved() { try { var j = JSON.parse(localStorage.getItem('shindan_v4') || 'null'); if (j && Date.now() - j.at < (CFG.RESUME_HOURS || 24) * 3600e3 && j.S && j.S.screenId !== 'S19') return j.S; } catch (e) {} return null; }
+  function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ S: S, at: Date.now() })); } catch (e) {} }
+  function loadSaved() { try { var j = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); if (j && Date.now() - j.at < (CFG.RESUME_HOURS || 24) * 3600e3 && j.S && j.S.screenId !== 'S19') return j.S; } catch (e) {} return null; }
   function ga(ev, params) { try { if (window.gtag) window.gtag('event', ev, params || {}); } catch (e) {} console.debug('[ga]', ev, params || ''); }
   function industry() { return master.industries[S.a.industry]; }
   function enabledList() { return CFG.ENABLED_INDUSTRIES || master.enabled_industries; }
@@ -98,6 +99,7 @@
     list.push({ id: 'S10c3', type: 'vacancy' });
     if (a.vacancies) list.push({ id: 'S10c4', type: 'single', key: 'vacancy_months', q: 'そのポジションは、どれくらい埋まっていませんか（平均）', opts: LABELS.vacmonths });
     list.push({ id: 'S15', type: 'result' });
+    if (CFG.STANDALONE) return list;
     list.push({ id: 'S16', type: 'single', key: 'p1', q: 'AIを使えるようになってほしいのは、誰ですか', opts: LABELS.p1 });
     list.push({ id: 'S17', type: 'single', key: 'p2', q: '投資に見合った効果が得られると分かれば、どれぐらいまで投資できますか（年間）', opts: LABELS.p2 });
     list.push({ id: 'S18', type: 'prescription' });
@@ -126,7 +128,7 @@
     if (cur < resultIdx) {
       var remain = resultIdx - cur; left.textContent = 'あと' + remain + '問';
       var p = Math.round((cur / resultIdx) * 100); pct.textContent = p + '%'; fill.style.width = p + '%';
-    } else { left.textContent = cur < screens.length - 1 ? '診断結果まであと少し' : '完了'; pct.textContent = '100%'; fill.style.width = '100%'; }
+    } else { left.textContent = CFG.STANDALONE ? '診断完了' : (cur < screens.length - 1 ? '診断結果まであと少し' : '完了'); pct.textContent = '100%'; fill.style.width = '100%'; }
   }
 
   // ---------- 描画 ----------
@@ -196,10 +198,10 @@
 
   function rNotReady() {
     var ind = industry() || { name: S.a.industry_sub || 'この業種' };
-    var el = h('<div><h2>' + esc(ind.name) + 'は準備中です</h2><p>近日中に対応します。準備ができたらLINEでお知らせしますので、少しお待ちください。</p></div>');
-    var b = h('<a class="btn navy" href="' + esc(CFG.LINE_ADD_URL || '#') + '">LINEに戻る</a>'); el.appendChild(b);
+    var el = h('<div><h2>' + esc(ind.name) + 'は準備中です</h2><p>' + (CFG.STANDALONE ? '対応している近い業種を選び直すか、詳細診断でご相談ください。' : '近日中に対応します。準備ができたらLINEでお知らせしますので、少しお待ちください。') + '</p></div>');
+    var b = h('<a class="btn navy" href="' + esc(CFG.STANDALONE ? CFG.BOOKING_URL : (CFG.LINE_ADD_URL || '#')) + '">' + (CFG.STANDALONE ? '詳細診断を申し込む' : 'LINEに戻る') + '</a>'); el.appendChild(b);
     var bb = h('<button class="btn ghost">業種を選び直す</button>'); bb.onclick = back; el.appendChild(bb);
-    sendMessageText('【診断_準備中】' + ind.name, true);
+    if (!CFG.STANDALONE) sendMessageText('【診断_準備中】' + ind.name, true);
     return el;
   }
 
@@ -500,7 +502,19 @@
     if (cs.length) el.appendChild(h('<div class="card"><h3 style="margin-top:0">同業は、もう動いています</h3>' + caseHtml(cs[0]) + (zero ? '' : '<p class="sub">その会社との差は、毎年この額ずつ開きます。</p>') + '</div>'));
     el.appendChild(h('<p class="pardon">悪いのは社長ではありません。何から始めるかを、誰も順番で教えてくれなかっただけです。</p>'));
     if (false) el.appendChild(h('<div class="card"><h3 style="margin-top:0">入れて終わりだと、戻らない分</h3><p>いまの現場の状態から推計した定着率は <b>' + r.retention_rate + '%</b>。このまま入れると、約<span class="danger">' + man(C.roundYen(r.unrecovered_mid)) + '</span>分は現場で使われずに戻らない可能性があります。</p></div>'));
-    var nav = navBar('診断結果を見る', true, function () { ga('diag_result_next'); return true; }); el.appendChild(nav);
+    if (CFG.STANDALONE) {
+      S.route = C.decideRoute(a);
+      if (!S.completed_at) {
+        S.completed_at = new Date().toISOString(); save();
+        postToGas('complete'); ga('diag_complete', { route: S.route, loss_band: C.lossBand(r.mid) });
+      }
+      el.appendChild(h('<p class="presc-lead">AIと経営の現場を知る公認会計士が、御社に合った進め方を詳しく診断します。</p>'));
+      var booking = h('<a class="btn primary booking-cta" href="' + esc(CFG.BOOKING_URL) + '">詳細診断を申し込む</a>');
+      booking.onclick = function () { a.cta = 'book'; save(); ga('diag_cta_book', { route: S.route }); };
+      el.appendChild(booking);
+    } else {
+      var nav = navBar('診断結果を見る', true, function () { ga('diag_result_next'); return true; }); el.appendChild(nav);
+    }
     // 前提
     var det = h('<details class="assump"><summary>この計算の前提（すべて開示）</summary></details>');
     det.addEventListener('toggle', function () { if (det.open) { S.a.assumptions_opened = true; save(); ga('diag_assumptions_open'); } });
@@ -509,13 +523,16 @@
     r.by_area.forEach(function (ar) {
       var tr = hRow('<tr><td>' + esc(ar.name) + '</td><td>' + ar.headcount + '名</td><td><input type="range" min="500" max="20000" step="100" value="' + ar.wage + '" data-area="' + ar.id + '"><div class="small"><span class="wv">' + ar.wage.toLocaleString() + '</span>円</div></td></tr>');
       var rg = tr.querySelector('input');
+      rg.setAttribute('aria-label', ar.name + 'の時給');
       rg.oninput = function () { tr.querySelector('.wv').textContent = Number(rg.value).toLocaleString(); if (ar.id === 'CM-EXE') S.a.exec_wage = Number(rg.value); else S.a.wage_override[ar.id] = Number(rg.value); S.a.wage_slider_used = true; save(); ga('diag_wage_slider'); render(); document.querySelector('details.assump').open = true; };
       tbl.querySelector('tbody').appendChild(tr);
     });
-    det.appendChild(tbl);
+    var wageTable = h('<div class="table-scroll" role="region" aria-label="部門ごとの計算条件" tabindex="0"></div>');
+    wageTable.appendChild(tbl); det.appendChild(wageTable);
     var t2 = h('<table><tbody><tr><th>業務</th><th>人数</th><th>週h/人（目安）</th><th>削減率</th><th>現状</th><th>残業</th></tr></tbody></table>');
     r.by_area.forEach(function (ar) { ar.tasks.forEach(function (t) { t2.querySelector('tbody').appendChild(hRow('<tr><td>' + esc(t.name) + '</td><td>' + t.n + '</td><td>' + t.hours + '（' + t.hours_per_week + '）</td><td>' + t.rate_low + '/' + t.rate_mid + '/' + t.rate_high + '</td><td>' + t.status + '</td><td>' + (LABELS.overtime[t.overtime] || '').slice(0, 6) + '</td></tr>')); }); });
-    det.appendChild(t2);
+    var taskTable = h('<div class="table-scroll" role="region" aria-label="業務ごとの計算条件" tabindex="0"></div>');
+    taskTable.appendChild(t2); det.appendChild(taskTable);
     det.appendChild(h('<p class="small">推計です。面談で実態に合わせて直します。既定値の根拠：業種別ロードマップ・支援実績・一般的な生成AI活用事例（マスタ ' + esc(master.version) + '）。</p>'));
     el.appendChild(det);
     return el;
@@ -563,7 +580,7 @@
     sendMessageText(txt, false).then(function () {
       if (CFG.UTAGE_FORM_URL) { var m = CFG.UTAGE_FORM_PARAM_MAP, q = {}; q[m.route] = S.route; q[m.industry] = industry().name; q[m.p2] = LABELS.p2[S.a.p2]; q[m.loss_band] = C.lossBand(S.result.mid); q[m.token] = S.token;
         location.href = CFG.UTAGE_FORM_URL + (CFG.UTAGE_FORM_URL.indexOf('?') >= 0 ? '&' : '?') + Object.keys(q).map(function (k) { return k + '=' + encodeURIComponent(q[k]); }).join('&'); return; }
-      try { localStorage.removeItem('shindan_v4'); } catch (e) {}
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
       if (liffReady && liff.isInClient && liff.isInClient()) liff.closeWindow(); else toast('ブラウザ単体モード：LINEへの送信内容はコンソールに出力しました');
     });
   }
@@ -590,7 +607,7 @@
   // 開発・検証用：状態を初期化して最初から（本番でも害はない）
   window.__shindanReset = function () {
     S = { token: '', started_at: '', src: S.src, screen: 0, screenId: 'S01', a: { industry: '', industry_group: '', industry_sub: '', emp_total: null, emp_part: null, wage: null, wage_default: null, wage_source: 'default', annual_income: null, role: '', revenue_band: '', revenue: null, gross_margin_rate: '', freed_use: '', areas: [], area_headcount: {}, area_headcount_source: {}, exec_count: 1, exec_wage: 5000, tasks: [], task_answers: {}, invest_amount: '', invest_used_rate: '', vacancies: null, vacancy_months: '', lead: '', f1: '', f2: '', f3: '', p1: '', p2: '', wage_override: {}, assumptions_opened: false, wage_slider_used: false, cta: '' }, screen_times: {}, result: null, route: '', completed_at: '' };
-    try { localStorage.removeItem('shindan_v4'); } catch (e) {}
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
     screens = buildScreens(); render();
   };
   window.__shindanState = function () { return JSON.parse(JSON.stringify(S)); };
